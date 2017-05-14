@@ -135,8 +135,8 @@ std::vector<double> FastTextModel::classifierTest(std::string filename,
     }
 
     while (ifs.peek() != EOF) {
+        std::vector<int32_t> hashes;
         _dict->getLine(ifs, line, labels, _model->rng);
-        _dict->addNgrams(line, wordNgrams);
         if(labels.size() > 0 && line.size() > 0) {
             std::vector<std::pair<real, int32_t>> predictions;
             _model->predict(line, k, predictions);
@@ -174,20 +174,24 @@ std::vector<std::string> FastTextModel::classifierPredict(std::string text,
     std::istringstream iss(text);
     std::string token;
 
-    /* We implement the same logic as Dictionary::getLine */
-    std::uniform_real_distribution<> uniform(0, 1);
-    while(_dict->readWord(iss, token)) {
-        int32_t word_id = _dict->getId(token);
-        if(word_id < 0) continue;
-        entry_type type = _dict->getType(word_id);
-        if (type == entry_type::word &&
-                !_dict->discard(word_id, uniform(_model->rng))) {
-            text_word_ids.push_back(word_id);
-        }
-        if(text_word_ids.size() > max_line_size) break;
-    }
-    _dict->addNgrams(text_word_ids, wordNgrams);
+//   /* We implement the same logic as Dictionary::getLine */
+//   std::uniform_real_distribution<> uniform(0, 1);
+//   while(_dict->readWord(iss, token)) {
+//       int32_t word_id = _dict->getId(token);
+//       if(word_id < 0) continue;
+//       entry_type type = _dict->getType(word_id);
+//       if (type == entry_type::word &&
+//               !_dict->discard(word_id, uniform(_model->rng))) {
+//           text_word_ids.push_back(word_id);
+//       }
+//       if(text_word_ids.size() > max_line_size) break;
+//   }
+//   _dict->addNgrams(text_word_ids, wordNgrams);
 
+
+    std::vector<int32_t> line_labels;
+    std::minstd_rand rng;
+    _dict->getLine(iss, text_word_ids, line_labels, rng);
     std::vector<std::string> labels;
     if(text_word_ids.size() > 0) {
         std::vector<std::pair<real, int32_t>> predictions;
@@ -215,19 +219,25 @@ std::vector<std::vector<std::string>>
     std::istringstream iss(text);
     std::string token;
 
-    /* We implement the same logic as Dictionary::getLine */
-    std::uniform_real_distribution<> uniform(0, 1);
-    while(_dict->readWord(iss, token)) {
-        int32_t word_id = _dict->getId(token);
-        if(word_id < 0) continue;
-        entry_type type = _dict->getType(word_id);
-        if (type == entry_type::word &&
-                !_dict->discard(word_id, uniform(_model->rng))) {
-            text_word_ids.push_back(word_id);
-        }
-        if(text_word_ids.size() > max_line_size) break;
-    }
-    _dict->addNgrams(text_word_ids, wordNgrams);
+//   /* We implement the same logic as Dictionary::getLine */
+//   std::uniform_real_distribution<> uniform(0, 1);
+//   while(_dict->readWord(iss, token)) {
+//       int32_t word_id = _dict->getId(token);
+//       if(word_id < 0) continue;
+//       entry_type type = _dict->getType(word_id);
+//       if (type == entry_type::word &&
+//               !_dict->discard(word_id, uniform(_model->rng))) {
+//           text_word_ids.push_back(word_id);
+//       }
+//       if(text_word_ids.size() > max_line_size) break;
+//   }
+//   _dict->addNgrams(text_word_ids, wordNgrams);
+
+
+    std::vector<int32_t> line_labels;
+    std::minstd_rand rng;
+    _dict->getLine(iss, text_word_ids, line_labels, rng);
+
 
     std::vector<std::vector<std::string>> results;
     if(text_word_ids.size() > 0) {
